@@ -13,7 +13,26 @@ WFClass::WFClass(int polarity, float tUnit):
     bWinMin_(-1), bWinMax_(-1),  maxSample_(-1), fitAmpMax_(-1), baseline_(-1), bRMS_(-1),
     cfSample_(-1), cfFrac_(-1), cfTime_(-1), chi2cf_(-1), chi2le_(-1),
     fWinMin_(-1), fWinMax_(-1), tempFitTime_(-1), tempFitAmp_(-1), interpolator_(NULL)
-{}
+{
+    h1_ = 0;
+    h1mag_= 0;
+    h1phase_ = 0;
+    h1signalfft_ = 0;
+    inputFile_ = 0;
+}
+
+//**********Destructors*******************************************************************
+WFClass::~WFClass()
+{
+    if (h1_) delete h1_;
+    if (h1mag_) delete h1mag_;
+    if (h1phase_) delete h1phase_;
+    if (h1signalfft_) delete h1signalfft_;
+    if (inputFile_) {
+        if (inputFile_->IsOpen()) inputFile_->Close();
+    }
+}
+
 //**********Getters***********************************************************************
 
 //----------Get the max/min amplitude wrt polarity----------------------------------------
@@ -427,29 +446,27 @@ void WFClass::SetHisto(TString rootfilename, TString histoname)
     TString pathtofile;
     //pathtofile = "/afs/cern.ch/user/m/mlazarev/public/";
     pathtofile += rootfilename;
-
-    TFile *inputfile = new TFile(pathtofile); //AllNormalizedNoiseFFT.root
+    inputFile_ = new TFile(pathtofile); //AllNormalizedNoiseFFT.root
     
-    normNoiseFFT_ = (TH1F*) inputfile->Get(histoname); //NormNoiseFFT
+    normNoiseFFT_ = (TH1F*) inputFile_->Get(histoname); //NormNoiseFFT
     nbinsFFT_ = normNoiseFFT_->GetNbinsX();
+    
+    //supportFile_ = new TFile("testfile.root", "recreate");
 
     h1_ = new TH1F ("shiftedsampleshisto", "shifted samples histo", nbinsFFT_, 0, 160);
     h1mag_ = new TH1F ("shiftedsampleshistomag", "shifted samples histo mag", nbinsFFT_, 0, 5);
     h1phase_ = new TH1F ("shiftedsampleshistophase", "shifted samples histo phase", nbinsFFT_, 0, 800);
     h1signalfft_ = new TH1F ("signalfft", "signal FFT", nbinsFFT_, 0, 5);
-
-    inputfile->Close();
 }
 
-void WFClass::FilterFFT(WFClass& wf)
+void WFClass::FilterFFT()
 {
+    //for (int i=0; i<samples_.size(); i++) cout << "Samples at " << i << " = " << samples_.at(i) << endl;
     if(samples_.size() == 0)
     {
         std::cout << "ERROR: EMPTY WF" << std::endl;
         return;
     }
-
-    wf.Reset();
 
     int n=samples_.size();
 
@@ -464,18 +481,16 @@ void WFClass::FilterFFT(WFClass& wf)
     normNoiseFFT_->Scale(ped_rms);
 
     Double_t shiftedsamples_[nbinsFFT_];
+
     for (int i=0;i<nbinsFFT_;i++) {
         shiftedsamples_[i] = (samples_[i] - ped_mean);
     }
-
-
     for (int i=0;i<nbinsFFT_;i++) {
         h1_->SetBinContent(i+1, shiftedsamples_[i]);
     }
 
     h1_->FFT(h1mag_, "MAG");
     h1_->FFT(h1phase_, "PH");
-
     for (int i=0;i<nbinsFFT_;i++) {
         h1signalfft_->SetBinContent(i+1, (h1mag_->GetBinContent(i+1) - normNoiseFFT_->GetBinContent(i+1))); //S FFT = SN FFT - N FFT
     }
@@ -492,7 +507,6 @@ void WFClass::FilterFFT(WFClass& wf)
     vinvfft->Transform();
     Double_t temp_re[nbinsFFT_],temp_im[nbinsFFT_];
     vinvfft->GetPointsComplex(temp_re,temp_im); //temp_re is signal (unscaled by 1/entries after FFT) from 0-160 ns
-
     std::vector<double> inv_re;
 
     for (int i=0;i<nbinsFFT_;i++) {
@@ -503,17 +517,16 @@ void WFClass::FilterFFT(WFClass& wf)
     }
 
     for(int i=0;i<n;i++)
-        wf.AddSample(inv_re[i]);
+        AddSample(inv_re[i]);
 
     normNoiseFFT_->Scale(1/ped_rms);
-
-    delete h1_;
-    delete h1mag_;
-    delete h1phase_;
-    delete h1signalfft_;
-    delete normNoiseFFT_;
-    delete vinvfft;
-
+    //delete h1_;
+    //delete h1mag_;
+    //delete h1phase_;
+    //delete h1signalfft_;
+    //delete normNoiseFFT_;
+    //delete vinvfft;
+    inputFile_->Close();
     return;
 }
 
@@ -691,3 +704,4 @@ WFClass& WFClass::operator+=(const WFClass& sub)
     
     return *this;
 }
+

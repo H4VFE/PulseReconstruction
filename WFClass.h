@@ -13,6 +13,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "TString.h"
+#include "TFile.h"
 #include "TMath.h"
 #include "TH1F.h"
 #include "TF1.h"
@@ -44,7 +45,7 @@ public:
     WFClass() {};
     WFClass(int polarity, float tUnit);
     //---dtor---
-    ~WFClass() {};
+    ~WFClass();
 
     //---getters---
     inline vector<float>* GetSamples() {return &samples_;};
@@ -69,7 +70,7 @@ public:
     WFFitResults          TemplateFit(float offset=0., int lW=0, int hW=0);
     void                  EmulatedWF(WFClass& wf, float rms, float amplitude, float time);
     void                  FFT(WFClass& wf, float tau, int cut);
-    void                  FilterFFT(WFClass& wf);
+    void                  FilterFFT();
     void                  Print();
     //---operators---
     WFClass&              operator=(const WFClass& origin);
@@ -77,6 +78,14 @@ public:
     WFClass               operator+(const WFClass& add);
     WFClass&              operator-=(const WFClass& sub);
     WFClass&              operator+=(const WFClass& add);
+    //---nasty trick to get code working---
+    //TFile*                supportFile_;
+    TFile*                inputFile_;
+    TH1F*                 normNoiseFFT_;
+    TH1F*                 h1_;
+    TH1F*                 h1mag_;
+    TH1F*                 h1phase_;
+    TH1F*                 h1signalfft_;
 protected:
     //---utils---
     float                 BaselineRMS();
@@ -107,11 +116,7 @@ protected:
     int           fWinMax_;
     float         tempFitTime_;
     float         tempFitAmp_;
-    TH1F*         normNoiseFFT_;
-    TH1F*         h1_;
-    TH1F*         h1mag_;
-    TH1F*         h1phase_;
-    TH1F*         h1signalfft_;
+    
     int           nbinsFFT_;
     ROOT::Math::Interpolator* interpolator_;
 };
