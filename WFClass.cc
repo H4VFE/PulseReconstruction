@@ -14,6 +14,17 @@ WFClass::WFClass(int polarity, float tUnit):
     cfSample_(-1), cfFrac_(-1), cfTime_(-1), chi2cf_(-1), chi2le_(-1),
     fWinMin_(-1), fWinMax_(-1), tempFitTime_(-1), tempFitAmp_(-1), interpolator_(NULL)
 {
+    cout << "I am creating WFClass with arguments." << endl;
+    h1_ = 0;
+    h1mag_= 0;
+    h1phase_ = 0;
+    h1signalfft_ = 0;
+    inputFile_ = 0;
+}
+
+WFClass::WFClass()
+{
+    cout << "I am creating WFClass without arguments." << endl;
     h1_ = 0;
     h1mag_= 0;
     h1phase_ = 0;
@@ -457,6 +468,13 @@ void WFClass::SetHisto(TString rootfilename, TString histoname)
     h1mag_ = new TH1F ("shiftedsampleshistomag", "shifted samples histo mag", nbinsFFT_, 0, 5);
     h1phase_ = new TH1F ("shiftedsampleshistophase", "shifted samples histo phase", nbinsFFT_, 0, 800);
     h1signalfft_ = new TH1F ("signalfft", "signal FFT", nbinsFFT_, 0, 5);
+}
+
+void WFClass::CloseFile()
+{
+    if (inputFile_) {
+        if (inputFile_->IsOpen()) inputFile_->Close();
+    }
 }
 
 void WFClass::FilterFFT()

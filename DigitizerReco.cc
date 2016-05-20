@@ -91,7 +91,6 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
                 return false;
             WFs[channel]->AddSample(event.digiSampleValue[iSample]);
         }
-        //WFs[channel]->SetHisto("AllNormalizedNoiseFFT.root", "NormNoiseFFT");
     }
     
     //---compute reco variables
@@ -107,7 +106,11 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
                                       opts.GetOpt<int>(channel+".signalWin", 1)+timeRef);
         WFBaseline baselineInfo = WFs[channel]->SubtractBaseline();
 
-        //if (channel == "APD2") WFs[channel]->FilterFFT();
+        if (channel == "APD2") {
+            //WFs[channel]->SetHisto("AllNormalizedNoiseFFT.root", "NormNoiseFFT");
+            //WFs[channel]->FilterFFT();
+            //WFs[channel]->CloseFile();
+        }
         //WFs[channel]->FilterFFT();
 
         pair<float, float> timeInfo = WFs[channel]->GetTime(opts.GetOpt<string>(channel+".timeType"), timeOpts_[channel]);

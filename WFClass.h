@@ -42,7 +42,7 @@ class WFClass : public TObject
 {
 public:
     //---ctors---
-    WFClass() {};
+    WFClass();
     WFClass(int polarity, float tUnit);
     //---dtor---
     ~WFClass();
@@ -71,6 +71,7 @@ public:
     void                  EmulatedWF(WFClass& wf, float rms, float amplitude, float time);
     void                  FFT(WFClass& wf, float tau, int cut);
     void                  FilterFFT();
+    void                  CloseFile();
     void                  Print();
     //---operators---
     WFClass&              operator=(const WFClass& origin);
