@@ -29,7 +29,7 @@ void TemplateComparison() {
 	TH1F *New2 = new TH1F ("New2", "new template", 200, 0, 10);
 	Float_t mean, stddev;
 	TString drawtimeres, cut;
-	Int_t nspill = 102;
+	//Int_t nspill = 102;
 
     cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200";
     //cut += nspill;
@@ -105,7 +105,7 @@ void TemplateComparison() {
 
 	h4unf->SetEntryList(0);
     TString listcut = "fit_ampl[APD2]>700 && WF_ch==2";
-    list//cut += nspill;
+    //listcut += nspill;
     h4unf->Draw(">>myList", listcut, "entrylist");
     TEntryList *myList = (TEntryList*) gDirectory->Get("myList");
     h4unf->SetEntryList(myList);
@@ -113,7 +113,7 @@ void TemplateComparison() {
 
 	h4unf->SetEntryList(0);
     listcut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200 && WF_ch==2";
-    list//cut += nspill;
+    //listcut += nspill;
     h4unf->Draw(">>myList", listcut, "entrylist");
     myList = (TEntryList*) gDirectory->Get("myList");
     h4unf->SetEntryList(myList);
@@ -121,7 +121,7 @@ void TemplateComparison() {
 
     h4new->SetEntryList(0);
     listcut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200 && WF_ch==2";
-    list//cut += nspill;
+    //listcut += nspill;
     h4new->Draw(">>myList", listcut, "entrylist");
     myList = (TEntryList*) gDirectory->Get("myList");
     h4new->SetEntryList(myList);
@@ -189,7 +189,7 @@ void TemplateComparison() {
     //    vfAmpfit2[iEntry] = vTemp_fAmpfit2[iEntry];
     //}
 
-    cut = "spill ==";
+    //cut = "spill ==";
     //cut += nspill;
     h4unf->Draw("fit_time[APD2]", cut, "goff");
     Double_t *vTemp_uTime = h4unf->GetV1();
@@ -198,7 +198,7 @@ void TemplateComparison() {
         vuTime[iEntry] = vTemp_uTime[iEntry];
     }
 
-    cut = "spill ==";
+    //cut = "spill ==";
     //cut += nspill;
     h4new->Draw("fit_time[APD2]", cut, "goff");
     Double_t *vTemp_fTime = h4new->GetV1();
@@ -258,17 +258,24 @@ void TemplateComparison() {
     //max160->Draw();
     max->Draw("same");
 
-    TString filename = "spill";
-    filename += nspill;
-    filename += ".root";
-    TFile *outfile = new TFile(filename, "recreate");
+    //TString filename = "spill";
+    //filename += nspill;
+    //filename += ".root";
+    //TFile *outfile = new TFile(filename, "recreate");
+    //outfile->cd();
+    //Unf->Write();
+    //Old->Write();
+    //New->Write();
+    //Unf2->Write();
+    //Old2->Write();
+    //New2->Write();
+
+    TFile *outfile = new TFile("TimeResolution.root", "recreate");
     outfile->cd();
     Unf->Write();
     Old->Write();
     New->Write();
-    Unf2->Write();
-    Old2->Write();
-    New2->Write();
+    outfile->Close();
 
 
 	//h4unf->Draw("event", "spill==1", "goff");
