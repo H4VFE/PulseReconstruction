@@ -83,10 +83,8 @@ int main() {
         for (int iEntry = 0; iEntry<entriesperspill; iEntry++){
             vEvent[iEntry] = vTemp[iEntry];
         }
-        Double_t mean;
-        Double_t rms;
-        TString plot;
-        TString cut;
+        Double_t mean. rms;
+        TString plot, cut;
         for (j=0;j<entriesperspill;j++) {
             TString histoname = "Run3898TempHisto_";
             histoname += spill;
@@ -136,10 +134,8 @@ int main() {
         for (int iEntry = 0; iEntry<entriesperspill; iEntry++){
             vEvent[iEntry] = vTemp[iEntry];
         }
-        Double_t mean;
-        Double_t rms;
-        TString plot;
-        TString cut;
+        Double_t mean, rms;
+        TString plot, cut;
         for (j=0;j<entriesperspill;j++) {
             TString histoname = "Run3902TempHisto_";
             histoname += spill;
@@ -189,10 +185,8 @@ int main() {
         for (int iEntry = 0; iEntry<entriesperspill; iEntry++){
             vEvent[iEntry] = vTemp[iEntry];
         }
-        Double_t mean;
-        Double_t rms;
-        TString plot;
-        TString cut;
+        Double_t mean, rms;
+        TString plot, cut;
         for (j=0;j<entriesperspill;j++) {
             TString histoname = "Run3905TempHisto_";
             histoname += spill;

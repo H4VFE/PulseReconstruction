@@ -31,28 +31,27 @@ void TemplateComparison() {
 	TString drawtimeres, cut;
 	//Int_t nspill = 102;
 
-    cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
 	h4unf->Draw("fit_time[APD2]-time[MCP1]>>test", cut);
 	mean = test->GetMean();
 	drawtimeres = Form("fit_time[APD2]-time[MCP1]-%f>>Unf", mean);
-	cout << "unf mean = " << mean << endl;
 	h4unf->Draw(drawtimeres, cut);
 	
-    cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
 	h4old->Draw("fit_time[APD2]-time[MCP1]>>test", cut);
 	mean = test->GetMean();
 	drawtimeres = Form("fit_time[APD2]-time[MCP1]-%f>>Old", mean);
 	h4old->Draw(drawtimeres, cut);
 	
-	h4new->Draw("fit_time[APD2]-time[MCP1]>>test", "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200");
+	h4new->Draw("fit_time[APD2]-time[MCP1]>>test", "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3");// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1");
 	mean = test->GetMean();
 	drawtimeres = Form("fit_time[APD2]-time[MCP1]-%f>>New", mean);
 	cout << "filt mean = " << mean << endl;
-	h4new->Draw(drawtimeres, "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200");
+	h4new->Draw(drawtimeres, "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3");// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1");
 
-    //cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200 && spill==";
+    //cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && spill==";
     ////cut += nspill;
     //h4new2->Draw("fit_time[APD2]-time[MCP1]>>test", cut);
     //mean = test->GetMean();
@@ -67,6 +66,7 @@ void TemplateComparison() {
 	Unf->SetLineColor(kRed);
 	Old->SetLineColor(kOrange);
 	New->SetLineColor(kBlue);
+    c1->cd();
 	Unf->Draw();
 	Old->Draw("same");
 	New->Draw("same");
@@ -92,19 +92,20 @@ void TemplateComparison() {
 
 
 	c2->cd();
-	h4unf->Draw("b_rms[APD2]>>Unf2", "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200");
-	h4old->Draw("b_rms[APD2]>>Old2", "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200");
-	h4new->Draw("b_rms[APD2]>>New2", "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200");
+	h4unf->Draw("b_rms[APD2]>>Unf2", "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3");// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1");
+	h4old->Draw("b_rms[APD2]>>Old2", "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3");// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1");
+	h4new->Draw("b_rms[APD2]>>New2", "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3");// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1");
 	Unf2->SetLineColor(kRed);
 	Old2->SetLineColor(kOrange);
 	New2->SetLineColor(kBlue);
+    c2->cd();
 	Unf2->Draw();
 	Old2->Draw("same");
 	New2->Draw("same");
 	c3->cd();
 
 	h4unf->SetEntryList(0);
-    TString listcut = "fit_ampl[APD2]>700 && WF_ch==2";
+    TString listcut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && amp_max[MCP1]>300 && fit_ampl[APD2]>700 && WF_ch==2 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //listcut += nspill;
     h4unf->Draw(">>myList", listcut, "entrylist");
     TEntryList *myList = (TEntryList*) gDirectory->Get("myList");
@@ -112,7 +113,7 @@ void TemplateComparison() {
     Int_t nevents = myList->GetN();
 
 	h4unf->SetEntryList(0);
-    listcut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200 && WF_ch==2";
+    listcut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>300 && WF_ch==2 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //listcut += nspill;
     h4unf->Draw(">>myList", listcut, "entrylist");
     myList = (TEntryList*) gDirectory->Get("myList");
@@ -120,7 +121,7 @@ void TemplateComparison() {
     Int_t neventsunf = myList->GetN();
 
     h4new->SetEntryList(0);
-    listcut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200 && WF_ch==2";
+    listcut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && WF_ch==2 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //listcut += nspill;
     h4new->Draw(">>myList", listcut, "entrylist");
     myList = (TEntryList*) gDirectory->Get("myList");
@@ -128,14 +129,14 @@ void TemplateComparison() {
     Int_t neventsnew = myList->GetN();
 
     //h4new2->SetEntryList(0);
-    //listcut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200 && WF_ch==2 && spill==";
+    //listcut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && WF_ch==2 && spill==";
     //list//cut += nspill;
     //h4new2->Draw(">>myList", listcut, "entrylist");
     //myList = (TEntryList*) gDirectory->Get("myList");
     //h4new2->SetEntryList(myList);
     //Int_t neventsnew2 = myList->GetN();
 
-    cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
     h4unf->Draw("b_rms[APD2]", cut, "goff");
     Double_t *vTemp_uBrms = h4unf->GetV1();
@@ -144,7 +145,7 @@ void TemplateComparison() {
         vuBrms[iEntry] = vTemp_uBrms[iEntry];
     }
 
-    cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
     h4new->Draw("b_rms[APD2]", cut, "goff");
     Double_t *vTemp_fBrms = h4new->GetV1();
@@ -153,7 +154,7 @@ void TemplateComparison() {
         vfBrms[iEntry] = vTemp_fBrms[iEntry];
     }
 
-    //cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200 && spill==";
+    //cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && spill==";
     ////cut += nspill;
     //h4new2->Draw("b_rms[APD2]", cut, "goff");
     //Double_t *vTemp_fBrms2 = h4new2->GetV1();
@@ -162,7 +163,7 @@ void TemplateComparison() {
     //    vfBrms2[iEntry] = vTemp_fBrms2[iEntry];
     //}
 
-    cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>200";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
 	h4unf->Draw("fit_ampl[APD2]", cut, "goff");
     Double_t *vTemp_uAmpfit = h4unf->GetV1();
@@ -171,7 +172,7 @@ void TemplateComparison() {
         vuAmpfit[iEntry] = vTemp_uAmpfit[iEntry];
     }
 
-    cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
     h4new->Draw("fit_ampl[APD2]", cut, "goff");
     Double_t *vTemp_fAmpfit = h4new->GetV1();
@@ -180,7 +181,7 @@ void TemplateComparison() {
         vfAmpfit[iEntry] = vTemp_fAmpfit[iEntry];
     }
 
-    //cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>200";
+    //cut = "abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300";
     ////cut += nspill;
     //h4new2->Draw("fit_ampl[APD2]", cut, "goff");
     //Double_t *vTemp_fAmpfit2 = h4new->GetV1();
@@ -189,7 +190,7 @@ void TemplateComparison() {
     //    vfAmpfit2[iEntry] = vTemp_fAmpfit2[iEntry];
     //}
 
-    //cut = "spill ==";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>700 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
     h4unf->Draw("fit_time[APD2]", cut, "goff");
     Double_t *vTemp_uTime = h4unf->GetV1();
@@ -198,7 +199,7 @@ void TemplateComparison() {
         vuTime[iEntry] = vTemp_uTime[iEntry];
     }
 
-    //cut = "spill ==";
+    cut = "b_rms[APD2]<10 && abs(b_slope[APD2])<6 && fit_ampl[APD2]>717 && amp_max[MCP1]>300 && abs(X[0]-(-4.9))<3 && abs(Y[0]-(-2.9))<3";// && abs(X[0]-hodoX2+2.41)<1 && abs(Y[0]-hodoY2)<1";
     //cut += nspill;
     h4new->Draw("fit_time[APD2]", cut, "goff");
     Double_t *vTemp_fTime = h4new->GetV1();
@@ -276,6 +277,14 @@ void TemplateComparison() {
     Old->Write();
     New->Write();
     outfile->Close();
+
+    c1->cd();
+    Unf->Draw();
+    c1->SaveAs("UnfilteredTimeRes.png");
+    Old->Draw();
+    c1->SaveAs("OldTemplateTimeRes.png");
+    New->Draw();
+    c1->SaveAs("NewTemplateTimeRes.png");
 
 
 	//h4unf->Draw("event", "spill==1", "goff");

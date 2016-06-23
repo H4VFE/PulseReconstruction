@@ -140,11 +140,11 @@ int main() {
         //h1004->GetYaxis()->SetRangeUser(-0.1,0.1);
         //gPad->SetGrid();
         can1->SaveAs(name);
-        h1002->FFT(h1002fft, "MAG");
-        h1002->FFT(h1002ph, "PH");
-        histoavefft->Add(histoavefft, h1002fft);
-        histoaveph->Add(histoaveph, h1002ph);
-        //histoave->Add(histoave, h1002);
+        //h1002->FFT(h1002fft, "MAG");
+        //h1002->FFT(h1002ph, "PH");
+        //histoavefft->Add(histoavefft, h1002fft);
+        //histoaveph->Add(histoaveph, h1002ph);
+        histoave->Add(histoave, h1002);
         can2->cd(2);
         h1002->Scale(1./(h1002->GetMaximum()));
         h1002->Draw("same");
@@ -153,25 +153,25 @@ int main() {
         gDirectory->Clear();
 	}
     can2->cd(1);
-    histoavefft->Scale(1./count);
-    histoaveph->Scale(1./count);
-    //histoave->Scale(1./count);
+    //histoavefft->Scale(1./count);
+    //histoaveph->Scale(1./count);
+    histoave->Scale(1./count);
     
-    Double_t *re_full = new Double_t[nbins];
-    Double_t *im_full = new Double_t[nbins];
-    TH1 *Throwaway = 0;
+    //Double_t *re_full = new Double_t[nbins];
+    //Double_t *im_full = new Double_t[nbins];
+    //TH1 *Throwaway = 0;
     //TH1F *invhistoave = new TH1F(invhistoave, "Average Pulse", nbins, -40, 120);
-    TVirtualFFT *invFFT = TVirtualFFT::FFT(1, &nbins, "C2R M K");
-     for (Int_t n=0; n<nbins; n++) {
-        (re_full)[n]=(histoavefft->GetBinContent(n+1)*cos(histoaveph->GetBinContent(n+1)));
-        (im_full)[n]=(histoavefft->GetBinContent(n+1)*sin(histoaveph->GetBinContent(n+1)));
-    }
-    invFFT->SetPointsComplex(re_full, im_full);
-    invFFT->Transform();
-    Throwaway = TH1::TransformHisto(invFFT, Throwaway, "Re");
-    for (Int_t p=0; p<nbins; p++) {
-        histoave->SetBinContent(p+1, Throwaway->GetBinContent(p+1)/nbins);
-    }
+    //TVirtualFFT *invFFT = TVirtualFFT::FFT(1, &nbins, "C2R M K");
+    //for (Int_t n=0; n<nbins; n++) {
+    //    (re_full)[n]=(histoavefft->GetBinContent(n+1)*cos(histoaveph->GetBinContent(n+1)));
+    //    (im_full)[n]=(histoavefft->GetBinContent(n+1)*sin(histoaveph->GetBinContent(n+1)));
+    //}
+    //invFFT->SetPointsComplex(re_full, im_full);
+    //invFFT->Transform();
+    //Throwaway = TH1::TransformHisto(invFFT, Throwaway, "Re");
+    //for (Int_t p=0; p<nbins; p++) {
+    //    histoave->SetBinContent(p+1, Throwaway->GetBinContent(p+1)/nbins);
+    //}
     histoave->Scale(1./(histoave->GetMaximum()));
     //histoave->SetLineColor(kRed);
     //histoave->SetLineWidth(4);

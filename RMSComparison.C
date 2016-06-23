@@ -43,10 +43,13 @@ TH1F* transform2Dto1D (TH2F *h2) {
 }
 
 int main() {
+    cout << "June 7 10:50 PM" << endl;
     Int_t nspill = 1;
     Int_t nbins = 800;
-    TFile f("/home/marko/Desktop/Data Files/analysis_4443.root");
-    TFile f1("/home/marko/Music/analysis_4443.root");
+    //TFile f("/home/marko/Desktop/Data Files/analysis_4443.root");
+    //TFile f1("/home/marko/Music/analysis_4443.root");
+    TFile f("public/Data Files/analysis_4443.root");
+    TFile f1("H4Analysis/ntuples/analysis_4443.root");
     TTree* h4unfiltered = (TTree*) f.Get("h4");
     TTree* h4filtered = (TTree*) f1.Get("h4");
     h4unfiltered->SetEntryList(0);
@@ -124,6 +127,20 @@ int main() {
     Double_t *vfAmpmax = new Double_t[nevents];
     for (int iEntry = 0; iEntry<nevents; iEntry++) {
         vfAmpmax[iEntry] = vTemp_fAmpmax[iEntry];
+    }
+
+    h4unfiltered->Draw("amp_max[MCP1]", "spill==1", "goff");
+    Double_t *vTemp_uAmpmaxmcp = h4unfiltered->GetV1();
+    Double_t *vuAmpmaxmcp = new Double_t[nevents];
+    for (int iEntry = 0; iEntry<nevents; iEntry++) {
+        vuAmpmaxmcp[iEntry] = vTemp_uAmpmaxmcp[iEntry];
+    }
+
+    h4filtered->Draw("amp_max[MCP1]", "spill==1", "goff");
+    Double_t *vTemp_fAmpmaxmcp = h4filtered->GetV1();
+    Double_t *vfAmpmaxmcp = new Double_t[nevents];
+    for (int iEntry = 0; iEntry<nevents; iEntry++) {
+        vfAmpmaxmcp[iEntry] = vTemp_fAmpmaxmcp[iEntry];
     }
 
     h4unfiltered->Draw("time[MCP1]", "spill==1", "goff");
@@ -234,7 +251,7 @@ int main() {
     //    vfChargesig[iEntry] = vTemp_fChargesig[iEntry];
     //}
 
-    Float_t unfilteredevent, filteredevent, unfilteredrms, filteredrms, unfilteredbrms, filteredbrms, unfilteredbslope, filteredbslope, unfilteredmax, filteredmax, unfilteredampmax, filteredampmax, unfilteredtimefit, filteredtimefit, unfilteredtimeref, filteredtimeref, unfilteredampfit, filteredampfit;
+    Float_t unfilteredevent, filteredevent, unfilteredrms, filteredrms, unfilteredbrms, filteredbrms, unfilteredbslope, filteredbslope, unfilteredmax, filteredmax, unfilteredampmax, filteredampmax, unfilteredtimefit, filteredtimefit, unfilteredtimeref, filteredtimeref, unfilteredampfit, filteredampfit, unfilteredampmaxmcp, filteredampmaxmcp;
     Int_t count = 0, counter;
     Float_t sum, sum2;
     TFile out("FilterRMSComparison.root", "recreate");
@@ -257,6 +274,9 @@ int main() {
 
     MyTree->Branch("unfilteredampmax", &unfilteredampmax, "unfilteredampmax/F");
     MyTree->Branch("filteredampmax", &filteredampmax, "filteredampmax/F");
+
+    MyTree->Branch("unfilteredampmaxmcp", &unfilteredampmaxmcp, "unfilteredampmaxmcp/F");
+    MyTree->Branch("filteredampmaxmcp", &filteredampmaxmcp, "filteredampmaxmcp/F");
 
     MyTree->Branch("unfilteredtimeref", &unfilteredtimeref, "unfilteredtimeref/F");
     MyTree->Branch("filteredtimeref", &filteredtimeref, "filteredtimeref/F");
@@ -350,16 +370,16 @@ int main() {
         //filteredrms = TempHisto->GetRMS(2);
         //TempHisto->GetXaxis()->SetRange(0,nbins);
 
-        sprintf(name, "All Events/Event%d", vEvent[j]);
-        strcat(name, ".png");
-        h1001->SetLineColor(kRed);
-        h1002->SetLineColor(kBlue);
-        h1001->SetStats(0);
-        h1002->SetStats(0);
-        can1->cd();
-        h1001->Draw();
-        h1002->Draw("same");
-        can1->SaveAs(name);
+        //sprintf(name, "All Events/Event%d", vEvent[j]);
+        //strcat(name, ".png");
+        //h1001->SetLineColor(kRed);
+        //h1002->SetLineColor(kBlue);
+        //h1001->SetStats(0);
+        //h1002->SetStats(0);
+        //can1->cd();
+        //h1001->Draw();
+        //h1002->Draw("same");
+        //can1->SaveAs(name);
 
         unfilteredbslope = vuBslope[j];
         filteredbslope = vfBslope[j];
@@ -372,6 +392,9 @@ int main() {
 
         unfilteredampmax = vuAmpmax[j];
         filteredampmax = vfAmpmax[j];
+
+        unfilteredampmaxmcp = vuAmpmaxmcp[j];
+        filteredampmaxmcp = vfAmpmaxmcp[j];
 
         unfilteredtimeref = vuTimeref[j];
         filteredtimeref = vfTimeref[j];

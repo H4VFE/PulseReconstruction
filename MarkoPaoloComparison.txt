@@ -1,0 +1,25 @@
+Paolo wout slope RMS < 10 with position 2 cuts = 183 ps
+Paolo wout slope RMS < 04 with position 2 cuts = 117 ps
+
+Paolo wout slope RMS < 10 wout position 2 cuts = 184 ps ---> position 2 cuts low impact
+Paolo wout slope RMS < 04 wout position 2 cuts = 119 ps ---> position 2 cuts low impact
+
+Paolo with slope RMS < 10 wout position 2 cuts = 154 ps
+
+
+
+
+
+Marko wout slope RMS < 10 wout position 2 cuts = 193 ps
+Marko wout slope RMS < 10 wout position 2 cuts FILTERED = 
+
+
+
+Marko wout slope RMS < 04 wout position 2 cuts = 132 ps
+Marko wout slope noRMScut wout position 2 cuts = 218 ps
+
+Marko with slope RMS < 10 wout position 2 cuts = 171 ps (-22 ps)
+Marko with slope RMS < 04 wout position 2 cuts = 132 ps  ---> same as if there was no slope cut
+Marko with slope noRMScut wout position 2 cuts = 179 ps (-39 ps) ---> original value before Paolo cuts
+
+

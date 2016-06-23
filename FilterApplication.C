@@ -71,7 +71,7 @@ int main() {
     Int_t nspill = 1;
     Int_t nbins = 800;
     Int_t j;
-    TFile f("/home/marko/Desktop/H4Analysis/ntuples/analysis_4443.root");
+    TFile f("/home/marko/Desktop/Data Files/analysis_4443.root");
     TTree* h4 = (TTree*) f.Get("h4");
     h4->SetEntryList(0);
     TString listcut = "WF_ch==2 && spill==1";
@@ -207,16 +207,7 @@ int main() {
         sprintf(title,"Signal Event%d Histo", z+1);
         SignalEvent1800Events[z+1] = new TH1F(name,title, nbins, -0.1, 159.9);
     }
-    Float_t mean;
-    Float_t rms;
-    Float_t rmsprime100;
-    Float_t rmsprime250;
-    Float_t rmsprime500;
-    Float_t rmsprime750;
-    Float_t rmsprime1000;
-    Float_t rmsprime1250;
-    Float_t rmsprime1500;
-    Float_t rmsprime1800;
+    Float_t mean, rms, rmsprime100, rmsprime250, rmsprime500, rmsprime750, rmsprime1000, rmsprime1250, rmsprime1500, rmsprime1800;
     Int_t count = 0;
     TFile f1("NormNoiseFFTs.root", "read");
     TFile f2("AllNormalizedNoiseFFT.root", "read");
@@ -248,14 +239,13 @@ int main() {
     MyTree->Branch("rmsprime1500", &rmsprime1500, "rmsprime1500/F");
     MyTree->Branch("rmsprime1800", &rmsprime1800, "rmsprime1800/F");
     MyTree->Branch("count", &count, "count/I");
-    TString plot;
-    TString cut;
+    TString plot, cut;
     TH1F* NormSigFFT = new TH1F ("NormSigFFT", "Normalized SignalNoise FFT", nbins, 0, 5);
     TH1F* Phase = new TH1F ("Phase", "Phase", nbins, -0.1, 799.9);
     TStopwatch t;
-    t.Start(); //1 hour runtime
-    for (j=1;j<nevents;j++) {
-    //for (j=1;j<11;j++) {
+    t.Start();
+    //for (j=1;j<nevents;j++) {
+    for (j=1;j<300;j++) {
         TString histoname = "TempHisto_";
         histoname += j;
         TH2F* TempHisto = new TH2F (histoname, "Temp Histo", nbins, -0.1, 159.9, 1000, -120, 800); //nanoseconds
@@ -356,6 +346,11 @@ int main() {
         NewHistoEvent[j]->Write();
         SignalEvent1500Events[j]->Write();
         out8.cd();
+
+        //NewHistoEventFFT[j]->Write();
+        //PhaseHistoEvent[j]->Write();
+
+
         NewHistoEvent[j]->Write();
         SignalEvent1800Events[j]->Write();
         rmsprime100 = pedestalrms1D(SignalEvent100Events[j]);

@@ -63,6 +63,7 @@ public:
     void                  SetBaselineWindow(int min, int max);
     void                  SetHisto(TString rootfilename, TString histoname);
     void                  SetTemplate(TH1* templateWF=NULL);
+    void                  ResetRMS() {bRMS_=-1;};
     //---utils---
     void                  Reset();
     void                  AddSample(float sample) {samples_.push_back(polarity_*sample);};
@@ -117,7 +118,6 @@ protected:
     int           fWinMax_;
     float         tempFitTime_;
     float         tempFitAmp_;
-    
     int           nbinsFFT_;
     ROOT::Math::Interpolator* interpolator_;
 };

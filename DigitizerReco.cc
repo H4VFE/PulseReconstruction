@@ -106,18 +106,45 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
                                       opts.GetOpt<int>(channel+".signalWin", 1)+timeRef);
         WFBaseline baselineInfo = WFs[channel]->SubtractBaseline();
 
+        //WFFitResults fitResults_prefilter{-1, -1000, -1};
+        //if(opts.GetOpt<bool>(channel+".templateFit"))
+        //{
+        //    fitResults_prefilter = WFs[channel]->TemplateFit(opts.GetOpt<float>(channel+".templateFit.fitWin", 0),
+        //                                           opts.GetOpt<int>(channel+".templateFit.fitWin", 1),
+        //                                           opts.GetOpt<int>(channel+".templateFit.fitWin", 2));
+        //    if (channel == "APD2") cout << "Ampl Before = " << fitResults_prefilter.ampl << " Time Before = " << fitResults_prefilter.time << " Chi2 Before = " << fitResults_prefilter.chi2 << endl;
+        //}
+
+        //cout << "-------------before filter-------------------" << endl;
+        //cout << baselineInfo.slope << endl;
+        //cout << baselineInfo.rms << endl;
+        //cout << baselineInfo.baseline << endl;
+        //cout << baselineInfo.k << endl;
+        //cout << baselineInfo.chi2 << endl;
+
         if (channel == "APD2") {
-            //WFs[channel]->SetHisto("AllNormalizedNoiseFFT.root", "NormNoiseFFT");
-            //WFs[channel]->FilterFFT();
-            //WFs[channel]->CloseFile();
+            WFs[channel]->SetHisto("AllNormalizedNoiseFFT.root", "NormNoiseFFT");
+            WFs[channel]->FilterFFT();
+            WFs[channel]->CloseFile();
         }
-        //WFs[channel]->FilterFFT();
+        WFs[channel]->ResetRMS();
+        WFBaseline baselineInfoPostFilter = WFs[channel]->SubtractBaseline();
 
         pair<float, float> timeInfo = WFs[channel]->GetTime(opts.GetOpt<string>(channel+".timeType"), timeOpts_[channel]);
         recoTree_.b_charge[outCh] = WFs[channel]->GetIntegral(opts.GetOpt<int>(channel+".baselineInt", 0), 
                                                              opts.GetOpt<int>(channel+".baselineInt", 1));        
-        recoTree_.b_slope[outCh] = baselineInfo.slope;
-        recoTree_.b_rms[outCh] = baselineInfo.rms;
+        recoTree_.b_slope[outCh] = baselineInfoPostFilter.slope;
+        recoTree_.b_rms[outCh] = baselineInfoPostFilter.rms;
+        recoTree_.b_k[outCh] = baselineInfoPostFilter.k;
+
+
+        //cout << "-------------after filter-------------------" << endl;
+        //cout << baselineInfoPostFilter.slope << endl;
+        //cout << baselineInfoPostFilter.rms << endl;
+        //cout << baselineInfoPostFilter.baseline << endl;
+        //cout << baselineInfoPostFilter.k << endl;
+        //cout << baselineInfoPostFilter.chi2 << endl;
+
         recoTree_.time[outCh] = timeInfo.first;
         recoTree_.time_chi2[outCh] = timeInfo.second;
         recoTree_.maximum[outCh] = WFs[channel]->GetAmpMax();
@@ -136,7 +163,9 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
             recoTree_.fit_ampl[outCh] = fitResults.ampl;
             recoTree_.fit_time[outCh] = fitResults.time;
             recoTree_.fit_chi2[outCh] = fitResults.chi2;
-        }            
+            if (channel == "APD2") cout << "Ampl After  = " << fitResults.ampl << " Time After  = " << fitResults.time << " Chi2 After  = " << fitResults.chi2 << endl;
+
+        }           
         //---WFs---
         if(fillWFtree)
         {
