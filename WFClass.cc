@@ -2,10 +2,7 @@
 
 #include "TRandom3.h"
 #include "TVirtualFFT.h"
-#include "TString.h"
 #include "TMath.h"
-#include "TFile.h"
-#include "TH1F.h"
 
 //**********Constructors******************************************************************
 WFClass::WFClass(int polarity, float tUnit):
@@ -13,8 +10,15 @@ WFClass::WFClass(int polarity, float tUnit):
     bWinMin_(-1), bWinMax_(-1),  maxSample_(-1), fitAmpMax_(-1), baseline_(-1), bRMS_(-1),
     cfSample_(-1), cfFrac_(-1), cfTime_(-1), chi2cf_(-1), chi2le_(-1),
     fWinMin_(-1), fWinMax_(-1), tempFitTime_(-1), tempFitAmp_(-1), interpolator_(NULL)
-{}
-
+{
+    //cout << "I am creating WFClass with arguments." << endl;
+    h1_ = 0;
+    h1mag_= 0;
+    h1phase_ = 0;
+    h1signalfft_ = 0;
+    inputFile_ = 0;
+}
+//**********Getters***********************************************************************
 
 //**********Destructors*******************************************************************
 WFClass::~WFClass()
@@ -27,8 +31,6 @@ WFClass::~WFClass()
         if (inputFile_->IsOpen()) inputFile_->Close();
     }
 }
-
-//**********Getters***********************************************************************
 
 //----------Get the max/min amplitude wrt polarity----------------------------------------
 float WFClass::GetAmpMax(int min, int max)
@@ -324,15 +326,17 @@ WFBaseline WFClass::SubtractBaseline(int min, int max)
     BaselineRMS();
     float A=0, B=0;
     float chi2 = LinearInterpolation(A, B, bWinMin_, bWinMax_);
+
     //cout << "--------------bRMS_-------------------" << endl;
     //cout << bRMS_ << endl;
+
     return WFBaseline{baseline_, bRMS_, A, B, chi2};
 }
 
 //----------template fit to the WF--------------------------------------------------------
 WFFitResults WFClass::TemplateFit(float offset, int lW, int hW)
 {
-    cout << "test if run" << endl;
+    //cout << "test if run" << endl;
     //if(tempFitAmp_ == -1)
     //{
         //---set template fit window around maximum, [min, max)
@@ -357,7 +361,7 @@ WFFitResults WFClass::TemplateFit(float offset, int lW, int hW)
 
         delete minimizer;        
     //}
-    cout << "My cout " << tempFitAmp_ << tempFitTime_ << TemplateChi2() << fWinMax_ << fWinMin_<< endl;
+    //cout << "My cout, " << "Amp = " << tempFitAmp_ << " Time = " << tempFitTime_ << " Chi2 = " << TemplateChi2() << " Win Max = " << fWinMax_ << " Win Min = " << fWinMin_<< endl;
     return WFFitResults{tempFitAmp_, tempFitTime_, TemplateChi2()/(fWinMax_-fWinMin_-2)};
 }
 
@@ -441,7 +445,7 @@ void WFClass::FFT(WFClass& wf, float tau, int cut)
 void WFClass::SetHisto(TString rootfilename, TString histoname)
 {
     TString pathtofile;
-    //pathtofile = "/afs/cern.ch/user/m/mlazarev/public/";
+    pathtofile = "/afs/cern.ch/user/m/mlazarev/public/";
     pathtofile += rootfilename;
     inputFile_ = new TFile(pathtofile); //AllNormalizedNoiseFFT.root
     
@@ -465,6 +469,7 @@ void WFClass::CloseFile()
 
 void WFClass::FilterFFT()
 {
+    //for (int i=0; i<samples_.size(); i++) cout << "Samples at " << i << " = " << samples_.at(i) << endl;
     if(samples_.size() == 0)
     {
         std::cout << "ERROR: EMPTY WF" << std::endl;
@@ -483,9 +488,9 @@ void WFClass::FilterFFT()
 
     normNoiseFFT_->Scale(ped_rms);
 
-    Double_t shiftedsamples_[nbinsFFT_];
+    Double_t shiftedsamples_[n];
 
-    for (int i=0;i<nbinsFFT_;i++) {
+    for (int i=0;i<n;i++) {
         shiftedsamples_[i] = (samples_[i] - ped_mean);
     }
     for (int i=0;i<nbinsFFT_;i++) {
@@ -493,17 +498,11 @@ void WFClass::FilterFFT()
     }
     h1_->FFT(h1mag_, "MAG");
     h1_->FFT(h1phase_, "PH");
-    
-    for (int i=0;i<nbinsFFT_;i++) {
-        h1signalfft_->SetBinContent(i+1, (h1mag_->GetBinContent(i+1) ));//- normNoiseFFT_->GetBinContent(i+1))); //S FFT = SN FFT - N FFT
-    }
 
-    //TFile histos = new TFile("histos.root", "recreate");
-    //h1_->Write();
-    //h1mag_->Write();
-    //h1phase_->Write();
-    //h1signalfft_->Write();
-    //histos->Close();
+    for (int i=0;i<nbinsFFT_;i++) {
+        h1signalfft_->SetBinContent(i+1, (h1mag_->GetBinContent(i+1) - normNoiseFFT_->GetBinContent(i+1))); //S FFT = SN FFT - N FFT
+        //h1signalfft_->SetBinContent(i+1, (h1mag_->GetBinContent(i+1) )); //- normNoiseFFT_->GetBinContent(i+1))); 
+    }
 
     Double_t signal_re[nbinsFFT_], signal_im[nbinsFFT_];
     for (int i=0;i<nbinsFFT_;i++) {
@@ -528,21 +527,35 @@ void WFClass::FilterFFT()
         inv_re.push_back(shiftedsamples_[i]); //adding on original tail to ensure that the standard is still 1024 indices
     }
 
-    std::vector<float> mynewsamples;
+    std::vector<float> mynewsamples; //original pulse
     for (int i=0; i<samples_.size(); i++) {
         mynewsamples.push_back(samples_.at(i));
     }
+
+    std::vector<float> mytruenewsamples; //signal-only pulse
+    for (int i=0;i<n;i++) {
+            mytruenewsamples.push_back(1.*inv_re[i]);
+        }
+
     samples_.clear();
 
-    for(int i=0;i<n;i++)
-        //AddSample(polarity_ * (inv_re[i]));
-        AddSample(mynewsamples.at(i));
-
-    for (int i=0;i<nbinsFFT_;i++) {
-        cout << "new value at " << i << " = " << samples_.at(i) << " & Throaway value = " << Throwaway->GetBinContent(i+1)/nbinsFFT_ << " & original value = " << mynewsamples.at(i) - ped_mean << endl;
+    for(int i=0;i<n;i++) {
+        AddSample(polarity_ * (inv_re[i]));
+        //AddSample(polarity_ * (mynewsamples.at(i)));
+        //AddSample(polarity_ * (mytruenewsamples.at(i)));
+    }
+    for (int i=0;i<n;i++) {
+    //    cout << "inv_re = " << inv_re.at(i) << " samples_ - ped = " << samples_.at(i) - ped_mean << " mynewsamples - ped = " << mynewsamples.at(i)-ped_mean << " Throwaway = " << Throwaway->GetBinContent(i+1)/nbinsFFT_ << " mytruenewsamples = " << mytruenewsamples.at(i) << endl;
     }
 
     normNoiseFFT_->Scale(1/ped_rms);
+
+    //TFile* histos = new TFile("histos.root", "recreate");
+    //h1_->Write();
+    //h1mag_->Write();
+    //h1phase_->Write();
+    //h1signalfft_->Write();
+    //histos->Close();
     delete Throwaway;
     //delete h1_;
     //delete h1mag_;
@@ -557,7 +570,7 @@ void WFClass::FilterFFT()
 //----------compute baseline RMS (noise)--------------------------------------------------
 float WFClass::BaselineRMS()
 {
-    //cout << "bwinmin = " bWinMin_ << " & bwinmax = " bWinMax_ << endl;
+    //cout << "bwinmin = " << bWinMin_ << " & bwinmax = " << bWinMax_ << endl;
     if(bRMS_ != -1)
         return bRMS_;
 
@@ -569,7 +582,11 @@ float WFClass::BaselineRMS()
         sum += samples_[iSample];
         sum2 += samples_[iSample]*samples_[iSample];
     }
+
+
     //cout << "sum2 = " << sum2 << endl;
+
+
     bRMS_=sqrt(sum2/nSample - pow(sum/nSample, 2));
     return bRMS_;
 }
@@ -728,4 +745,3 @@ WFClass& WFClass::operator+=(const WFClass& sub)
     
     return *this;
 }
-

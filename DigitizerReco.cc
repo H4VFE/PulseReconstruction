@@ -36,14 +36,14 @@ bool DigitizerReco::Begin(CfgManager& opts, uint64* index)
     }
     
     //---outputs---
-    string recoTreeName = opts.OptExist(instanceName_+".recoTreeName") ?
+    string recoTreeName = opts.GetOpt(instanceName_+".recoTreeName") ?
         opts.GetOpt<string>(instanceName_+".recoTreeName") : "reco";
     RegisterSharedData(new TTree(recoTreeName.c_str(), "reco_tree"), "reco_tree", true);
     recoTree_ = DigiTree(index, (TTree*)data_.back().obj);
     recoTree_.Init(channelsNames_);
     if(opts.GetOpt<int>(instanceName_+".fillWFtree"))
     {
-        string wfTreeName = opts.OptExist(instanceName_+".wfTreeName") ?
+        string wfTreeName = opts.GetOpt(instanceName_+".wfTreeName") ?
             opts.GetOpt<string>(instanceName_+".wfTreeName") : "wf";
         RegisterSharedData(new TTree(wfTreeName.c_str(), "wf_tree"), "wf_tree", true);
         outWFTree_ = WFTree(channelsNames_.size(), nSamples_, index, (TTree*)data_.back().obj);
@@ -97,9 +97,8 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
     for(auto& channel : channelsNames_)
     {
         //---subtract a specified channel if requested
-        if(opts.OptExist(channel+".subtractChannel"))
-            *WFs[channel] -= *WFs[opts.GetOpt<string>(channel+".subtractChannel")]; 
-
+        if(opts.GetOpt(channel+".subtractChannel"))
+            *WFs[channel] -= *WFs[opts.GetOpt<string>(channel+".subtractChannel")];        
         WFs[channel]->SetBaselineWindow(opts.GetOpt<int>(channel+".baselineWin", 0), 
                                         opts.GetOpt<int>(channel+".baselineWin", 1));
         WFs[channel]->SetSignalWindow(opts.GetOpt<int>(channel+".signalWin", 0)+timeRef, 
@@ -108,6 +107,7 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
 
         //WFFitResults fitResults_prefilter{-1, -1000, -1};
         //if(opts.GetOpt<bool>(channel+".templateFit"))
+    //if (channel == "APD2")
         //{
         //    fitResults_prefilter = WFs[channel]->TemplateFit(opts.GetOpt<float>(channel+".templateFit.fitWin", 0),
         //                                           opts.GetOpt<int>(channel+".templateFit.fitWin", 1),
@@ -117,17 +117,18 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
 
         //cout << "-------------before filter-------------------" << endl;
         //cout << baselineInfo.slope << endl;
-        //cout << baselineInfo.rms << endl;
+        //if (channel == "APD2") cout << baselineInfo.rms << endl;
         //cout << baselineInfo.baseline << endl;
         //cout << baselineInfo.k << endl;
         //cout << baselineInfo.chi2 << endl;
 
-        if (channel == "APD2") {
+    if (channel == "APD2") {
             WFs[channel]->SetHisto("AllNormalizedNoiseFFT.root", "NormNoiseFFT");
             WFs[channel]->FilterFFT();
             WFs[channel]->CloseFile();
         }
         WFs[channel]->ResetRMS();
+
         WFBaseline baselineInfoPostFilter = WFs[channel]->SubtractBaseline();
 
         pair<float, float> timeInfo = WFs[channel]->GetTime(opts.GetOpt<string>(channel+".timeType"), timeOpts_[channel]);
@@ -135,12 +136,12 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
                                                              opts.GetOpt<int>(channel+".baselineInt", 1));        
         recoTree_.b_slope[outCh] = baselineInfoPostFilter.slope;
         recoTree_.b_rms[outCh] = baselineInfoPostFilter.rms;
-        recoTree_.b_k[outCh] = baselineInfoPostFilter.k;
-
+        //recoTree_.b_slope[outCh] = baselineInfo.slope;
+        //recoTree_.b_rms[outCh] = baselineInfo.rms;
 
         //cout << "-------------after filter-------------------" << endl;
         //cout << baselineInfoPostFilter.slope << endl;
-        //cout << baselineInfoPostFilter.rms << endl;
+        //if (channel == "APD2") cout << baselineInfoPostFilter.rms << endl;
         //cout << baselineInfoPostFilter.baseline << endl;
         //cout << baselineInfoPostFilter.k << endl;
         //cout << baselineInfoPostFilter.chi2 << endl;
@@ -156,6 +157,7 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
         //---template fit (only specified channels)
         WFFitResults fitResults{-1, -1000, -1};
         if(opts.GetOpt<bool>(channel+".templateFit"))
+    //if (channel == "APD2")
         {
             fitResults = WFs[channel]->TemplateFit(opts.GetOpt<float>(channel+".templateFit.fitWin", 0),
                                                    opts.GetOpt<int>(channel+".templateFit.fitWin", 1),
@@ -163,9 +165,9 @@ bool DigitizerReco::ProcessEvent(const H4Tree& event, map<string, PluginBase*>& 
             recoTree_.fit_ampl[outCh] = fitResults.ampl;
             recoTree_.fit_time[outCh] = fitResults.time;
             recoTree_.fit_chi2[outCh] = fitResults.chi2;
-            if (channel == "APD2") cout << "Ampl After  = " << fitResults.ampl << " Time After  = " << fitResults.time << " Chi2 After  = " << fitResults.chi2 << endl;
+            //if (channel == "APD2") cout << "Ampl After  = " << fitResults.ampl << " Time After  = " << fitResults.time << " Chi2 After  = " << fitResults.chi2 << endl;
 
-        }           
+        }            
         //---WFs---
         if(fillWFtree)
         {

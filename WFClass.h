@@ -42,7 +42,7 @@ class WFClass : public TObject
 {
 public:
     //---ctors---
-    WFClass();
+    WFClass() {};
     WFClass(int polarity, float tUnit);
     //---dtor---
     ~WFClass();
@@ -61,8 +61,8 @@ public:
     //---setters---
     void                  SetSignalWindow(int min, int max);
     void                  SetBaselineWindow(int min, int max);
-    void                  SetHisto(TString rootfilename, TString histoname);
     void                  SetTemplate(TH1* templateWF=NULL);
+    void                  SetHisto(TString rootfilename, TString histoname);
     void                  ResetRMS() {bRMS_=-1;};
     //---utils---
     void                  Reset();
@@ -81,7 +81,6 @@ public:
     WFClass&              operator-=(const WFClass& sub);
     WFClass&              operator+=(const WFClass& add);
     //---nasty trick to get code working---
-    //TFile*                supportFile_;
     TFile*                inputFile_;
     TH1F*                 normNoiseFFT_;
     TH1F*                 h1_;
