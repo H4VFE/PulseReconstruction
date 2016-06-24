@@ -63,7 +63,7 @@ int main() {
     TH1F *histoaveph = new TH1F("histoaveph","Wave Pulse Average Phase", nbins, 0, 800);
     TH1F *originaltemplate = (TH1F*) templatefile->Get("APD2_E50_G50_prof");
     originaltemplate->Rebin(16);
-    TH1F *templatehisto = new TH1F("templatehisto", "Template = Green, Average = Red", nbins, -40, 120); //12500 bins
+    TH1F *templatehisto = new TH1F("templatehisto", "Template = Green, Average = Red", nbins, -40, 120); 
     TH1F *difference = new TH1F("difference","Template vs. Average Difference", nbins, -40, 120);
     TH1F *percentdifference = new TH1F("percentdifference","Template vs. Average Percent Difference", nbins, -40, 120);
     for (Int_t i=0;i<nbins;i++) {
@@ -173,16 +173,16 @@ int main() {
     //    histoave->SetBinContent(p+1, Throwaway->GetBinContent(p+1)/nbins);
     //}
     histoave->Scale(1./(histoave->GetMaximum()));
-    //histoave->SetLineColor(kRed);
-    //histoave->SetLineWidth(4);
+    histoave->SetLineColor(kRed);
+    histoave->SetLineWidth(4);
     integral = templatehisto->Integral();
     templatehisto->Scale(1./integral);
     templatehisto->SetStats(0);
     templatehisto->Draw();
-    //integral = histoave->Integral();
-    //histoave->Scale(1./integral);
+    integral = histoave->Integral();
+    histoave->Scale(1./integral);
     histoave->DrawClone("same");
-    //histoave->Scale(integral);
+    histoave->Scale(integral);
     can2->cd(2);
     histoave->GetXaxis()->SetTitle("Time (ns)");
     histoave->GetYaxis()->SetTitle("Normalized Amplitude");

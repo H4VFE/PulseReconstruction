@@ -244,8 +244,8 @@ int main() {
     TH1F* Phase = new TH1F ("Phase", "Phase", nbins, -0.1, 799.9);
     TStopwatch t;
     t.Start();
-    //for (j=1;j<nevents;j++) {
-    for (j=1;j<300;j++) {
+    for (j=1;j<nevents;j++) {
+    //for (j=1;j<300;j++) {
         TString histoname = "TempHisto_";
         histoname += j;
         TH2F* TempHisto = new TH2F (histoname, "Temp Histo", nbins, -0.1, 159.9, 1000, -120, 800); //nanoseconds

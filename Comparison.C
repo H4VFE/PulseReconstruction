@@ -17,7 +17,7 @@ void Comparison() {
 
     Int_t nevents = f1.GetListOfKeys()->GetEntries();
     nevents = nevents/2; //divide by 2 since there are 2 histograms (before and after subtraction) for each event
-
+    //---100 Events---
     for (Int_t j=1;j<=nevents;j++) {
         if (j==129) continue;
         if (j==670) continue;
@@ -47,6 +47,7 @@ void Comparison() {
     }
     rmsAveOrig100 = TMath::RMS(vAveOrig100.begin(), vAveOrig100.end());
     rmsAveSub100 = TMath::RMS(vAveSub100.begin(), vAveSub100.end());
+    count = 0;
     //---1800 Events---
     for (Int_t j=1;j<=nevents;j++) {
         if (j==129) continue;
